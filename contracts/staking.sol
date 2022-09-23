@@ -47,12 +47,10 @@ contract Stake {
 
     // Custom Errors
     ///Number of Staking Days not Met
-    error numberofDays();
+    // error numberofDays();
 
     function stakeTokens(uint _days) public payable depValue {
-        if (_days > 0) {
-            revert numberofDays();
-        }
+        require(_days > 0, "You can't Stake for Zero Days");
         State == stakingStatus.Open;
         StakeInfo storage SD = balance[msg.sender];
         SD.stakedAmount += msg.value;
@@ -76,6 +74,30 @@ function calculateAPY(uint _noOfDays, uint _year, uint _stakedAmount) private pu
     uint totalDays = _noOfDays/_year;
     totalYield = totalDays * _stakedAmount;
 }
+
+// Function to withdraw tokens
+
+function withdrawTokens() external {
+    StakeInfo storage SD = balance[msg.sender];
+    // State == block.timestamp + SD.noOfDays;
+    require(block.timestamp > SD.noOfDays, "Staking period not reached");
+    require(SD.stakedAmount > 0, "No On-going Stake");
+    uint calculatedReturns = calculateAPY(SD.noOfDays, SD.stakedAmount, SD.yearLater);
+
+    uint transferableTokens = SD.stakedAmount + calculatedReturns;
+
+    balance[msg.sender].stakedAmount = 0;
+    balance[msg.sender].noOfDays = 0;
+
+    payable(msg.sender).transfer(transferableTokens);
+    State == stakingStatus.Closed;
+
+
+
+}
+
+
+
 
 
 
