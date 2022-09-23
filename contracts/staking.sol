@@ -33,6 +33,10 @@ contract Stake {
         require(msg.sender == owner, "You are not the Owner");
         _;
     }
+    modifier depValue() {
+        require(msg.value > 0, "Insufficient Deposit");
+        _;
+    }
 
     receive() external payable {}
     fallback() external payable{}
@@ -41,6 +45,37 @@ contract Stake {
         owner = msg.sender;
     }
 
+    // Custom Errors
+    ///Number of Staking Days not Met
+    error numberofDays();
+
+    function stakeTokens(uint _days) public payable depValue {
+        if (_days > 0) {
+            revert numberofDays();
+        }
+        State == stakingStatus.Open;
+        StakeInfo storage SD = balance[msg.sender];
+        SD.stakedAmount += msg.value;
+        SD.noOfDays = block.timestamp + (_days * 1 days);
+        SD.yearLater = block.timestamp + 365 days;
+
+        
+
+    }
+
+// Function to get staking balance 
+
+function getBalance() view public returns(uint userBalance) {
+    userBalance = address(this).balance;
+
+}
+
+// Function to calculate APY
+function calculateAPY(uint _noOfDays, uint _year, uint _stakedAmount) private pure returns(uint totalYield) {
+    // StakeInfo storage SD = balance[msg.sender];
+    uint totalDays = _noOfDays/_year;
+    totalYield = totalDays * _stakedAmount;
+}
 
 
 
