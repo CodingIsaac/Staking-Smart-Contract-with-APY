@@ -1,6 +1,18 @@
 import { ethers } from "hardhat";
 
 async function main() {
+
+  const contract = await ethers.getContractFactory("Stake");
+
+  const deployedContract = await contract.deploy();
+
+  deployedContract.deployed();
+
+  console.log("Contract Successfully deployed here:", deployedContract.address)
+
+  // Contract Successfully deployed here: 0xE413D32CAFdA8b04E74f27038D1a162ab362cF4c
+
+
   
 }
 
